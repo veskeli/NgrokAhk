@@ -9,7 +9,7 @@ SetWorkingDir %A_ScriptDir%
 #SingleInstance Force
 ;____________________________________________________________
 ;//////////////[vars]///////////////
-version = 0.9
+version = 0.91
 if FileExist("Ngrok_config.ini")
 {
     IniRead, Ngrok_port, %A_WorkingDir%\Ngrok_config.ini, Port_Region_Protc,port,25565
@@ -20,11 +20,11 @@ if FileExist("Ngrok_config.ini")
 }
 Else
 {
-ngrok_location := "null"
-ngrok_region := "-region eu"
-Ngrok_protc := "tcp"
-Ngrok_port := "25565"
-Ngrok_custom := "ngrok tcp -region eu 25565"
+    ngrok_location := "null"
+    ngrok_region := "-region eu"
+    Ngrok_protc := "tcp"
+    Ngrok_port := "25565"
+    Ngrok_custom := "ngrok tcp -region eu 25565"
 }
 ;____________________________________________________________
 ;//////////////[Gui]///////////////
@@ -53,11 +53,27 @@ Gui Add, Edit, x8 y48 w304 h21 gSubmit vngrok_location, %ngrok_location%
 Gui Font, s13
 Gui Add, Button, x8 y72 w113 h27 gSave_location, Save location
 Gui Font
-Gui Add, Button, x198 y72 w120 h23 gPick_location, Pick location(Folder)
+Gui Add, Button, x120 y72 w120 h23 gPick_location, Pick location(Folder)
 Gui Add, Button, x8 y104 w189 h23 gSave_protoc, Save current port, protocol and region
-Gui Add, Button, x200 y104 w87 h23 gSave_Custom, Save Custom
+Gui Add, Button, x240 y72 w79 h23 gSave_Custom, Save Custom
+Gui Add, CheckBox, x200 y104 w120 h23 vcheckup +Checked +Disabled, Check for updates   ;gAutoUpdates
 
 Gui Show, w318 h134, Ngrok Menu
+;____________________________________________________________
+;//////////////[Check for updates]///////////////
+IfExist, %A_ScriptDir%\%appfoldername%\Settings\Settings.ini
+{
+    IniRead, t_checkup, %A_ScriptDir%\%appfoldername%\Settings\Settings.ini, Settings, Updates
+    if(t_checkup == 1)
+    {
+        goto checkForupdates
+    }
+}else
+{
+    goto checkForupdates
+}
+Return
+;Gui menu return
 Return
 ;____________________________________________________________
 ;//////////////[Submit]///////////////
@@ -121,5 +137,42 @@ else
 {
     ngrok_location = %SelectedFile%
     GuiControl, 1:,ngrok_location,%ngrok_location%
+}
+return
+;____________________________________________________________
+;____________________________________________________________
+;//////////////[checkForupdates]///////////////
+checkForupdates:
+whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+whr.Open("GET", "https://raw.githubusercontent.com/veskeli/NgrokAhk/master/Version.txt", False)
+whr.Send()
+whr.WaitForResponse()
+newversion := whr.ResponseText
+if(newversion != "")
+{
+    if(newversion != version)
+    {
+        MsgBox, 1,Update,New version is  %newversion% `nOld is %version% `nUpdate now?
+        IfMsgBox, Cancel
+        {
+            ;temp stuff
+        }
+        else
+        {
+            ;Download update
+            FileMove, %A_ScriptFullPath%, %A_ScriptDir%\Old_%A_ScriptName%, 1
+            sleep 1000
+            UrlDownloadToFile, https://raw.githubusercontent.com/veskeli/NgrokAhk/master/Ngrok.ahk, %A_ScriptFullPath%
+            Sleep 1000
+            loop
+            {
+                IfExist %A_ScriptFullPath%
+                {
+                    Run, %A_ScriptFullPath%
+                }
+            }
+			ExitApp
+        }
+    }
 }
 return
