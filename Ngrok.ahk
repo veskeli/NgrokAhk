@@ -1,4 +1,4 @@
-﻿/*
+/*
 Ngrok menu:
 */
 ;//////////////[Start settings]///////////////
@@ -9,7 +9,7 @@ SetWorkingDir %A_ScriptDir%
 #SingleInstance Force
 ;____________________________________________________________
 ;//////////////[vars]///////////////
-version = 0.91
+version = 0.92
 if FileExist("Ngrok_config.ini")
 {
     IniRead, Ngrok_port, %A_WorkingDir%\Ngrok_config.ini, Port_Region_Protc,port,25565
@@ -89,9 +89,14 @@ GuiClose:
 ;//////////////[Buttons]///////////////
 ;Ngrok
 Ngrok_start:
-if (ngrok_location == "null")                                 ;if ngrok location is not set give error
+testlocation = %ngrok_location%\ngrok.exe
+if (ngrok_location == "null" or ngrok_location == "")                                 ;if ngrok location is not set give error
 {
     MsgBox, 0, Error, Ngrok.exe location is not set. `n`nSet the location from settings
+}
+Else if (!FileExist(testlocation))
+{
+    MsgBox, 0, Error, Ngrok.exe not found in location. `n`nSet new location from settings
 }
 Else
 {
@@ -104,11 +109,23 @@ Else
 return
 ;Ngrok custom:
 Ngrok_start_custom:
-Run,%ComSpec%,%ngrok_location%
-WinWait, ahk_class ConsoleWindowClass
-ngrok_comm = %Ngrok_custom%
-send, %ngrok_comm%
-send, {Enter}
+testlocation = %ngrok_location%\ngrok.exe
+if (ngrok_location == "null" or ngrok_location == "")                                 ;if ngrok location is not set give error
+{
+    MsgBox, 0, Error, Ngrok.exe location is not set. `n`nSet the location from settings
+}
+Else if (!FileExist(testlocation))
+{
+    MsgBox, 0, Error, Ngrok.exe not found in location. `n`nSet new location from settings
+}
+Else
+{
+    Run,%ComSpec%,%ngrok_location%
+    WinWait, ahk_class ConsoleWindowClass
+    ngrok_comm = %Ngrok_custom%
+    send, %ngrok_comm%
+    send, {Enter}
+}
 return
 ;Shortcut
 Shortcut_to_desktop:
