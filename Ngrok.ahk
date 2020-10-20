@@ -1,4 +1,4 @@
-/*
+﻿/*
 Ngrok menu:
 */
 ;//////////////[Start settings]///////////////
@@ -9,7 +9,7 @@ SetWorkingDir %A_ScriptDir%
 #SingleInstance Force
 ;____________________________________________________________
 ;//////////////[vars]///////////////
-version = 0.92
+version = 0.93
 if FileExist("Ngrok_config.ini")
 {
     IniRead, Ngrok_port, %A_WorkingDir%\Ngrok_config.ini, Port_Region_Protc,port,25565
@@ -25,6 +25,11 @@ Else
     Ngrok_protc := "tcp"
     Ngrok_port := "25565"
     Ngrok_custom := "ngrok tcp -region eu 25565"
+}
+;remove old file if found
+if FileExist("Old_Ngrok.ahk")
+{
+    FileDelete, %A_ScriptDir%\Old_Ngrok.ahk
 }
 ;____________________________________________________________
 ;//////////////[Gui]///////////////
