@@ -9,7 +9,7 @@ SetWorkingDir %A_ScriptDir%
 #SingleInstance Force
 ;____________________________________________________________
 ;//////////////[vars]///////////////
-version = 0.93
+version = 0.94
 if FileExist("Ngrok_config.ini")
 {
     IniRead, Ngrok_port, %A_WorkingDir%\Ngrok_config.ini, Port_Region_Protc,port,25565
@@ -172,7 +172,7 @@ whr.WaitForResponse()
 newversion := whr.ResponseText
 if(newversion != "")
 {
-    if(newversion != version)
+    if(newversion > version)
     {
         MsgBox, 1,Update,New version is  %newversion% `nOld is %version% `nUpdate now?
         IfMsgBox, Cancel
@@ -191,9 +191,9 @@ if(newversion != "")
                 IfExist %A_ScriptFullPath%
                 {
                     Run, %A_ScriptFullPath%
+                    ExitApp
                 }
             }
-			ExitApp
         }
     }
 }
