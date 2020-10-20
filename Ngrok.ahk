@@ -9,7 +9,7 @@ SetWorkingDir %A_ScriptDir%
 #SingleInstance Force
 ;____________________________________________________________
 ;//////////////[vars]///////////////
-version = 0.942
+version = 0.943
 if FileExist("Ngrok_config.ini")
 {
     IniRead, Ngrok_port, %A_WorkingDir%\Ngrok_config.ini, Port_Region_Protc,port,25565
@@ -170,9 +170,10 @@ whr.Open("GET", "https://raw.githubusercontent.com/veskeli/NgrokAhk/master/Versi
 whr.Send()
 whr.WaitForResponse()
 newversion := whr.ResponseText
+StringReplace,newversion,newversion,`n,,A
 if(newversion != "")
 {
-    if(newversion >= version)
+    if(newversion > version)
     {
         MsgBox, 1,Update,New version is  %newversion% `nOld is %version% `nUpdate now?
         IfMsgBox, Cancel
